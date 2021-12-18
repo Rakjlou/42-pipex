@@ -6,61 +6,15 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/16 16:10:36 by nsierra-          #+#    #+#             */
-/*   Updated: 2021/12/18 04:48:27 by nsierra-         ###   ########.fr       */
+/*   Updated: 2021/12/18 05:29:52 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h> // REMOVE ME
-#include <errno.h>
-#include <fcntl.h>
 #include <unistd.h>
-#include <string.h>
+#include <fcntl.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <sys/wait.h>
 #include "pipex.h"
-
-static int	open_file(const char *filename, int oflags, int mode)
-{
-	int	fd;
-
-	fd = open(filename, oflags, mode);
-	if (fd <= 0)
-		return (perror(filename), -1);
-	return (fd);
-}
-
-static char	**build_path(char **env)
-{
-	while (*env)
-	{
-		if (ft_strncmp("PATH=", *env, 5) == 0 && ft_strlen(*env) > 5)
-			return (ft_split(*env + 5, ":"));
-		env++;
-	}
-	return (NULL);
-}
-
-static t_bool	load_pipex(int ac, char **av, char **env, t_pipex *p)
-{
-	p->source = av[1];
-	p->dest = av[ac - 1];
-	p->env = env;
-	p->path = build_path(p->env);
-	p->dest_oflags = O_WRONLY | O_CREAT | O_TRUNC;
-	p->dest_mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-	p->source_fd = open_file(p->source, O_RDONLY, 0);
-	if (p->source_fd <= 0)
-		return (false);
-	p->dest_fd = open_file(p->dest, p->dest_oflags, p->dest_mode);
-	if (p->dest_fd <= 0)
-	{
-		if (close(p->source_fd) == -1)
-			perror(p->dest);
-		return (false);
-	}
-	p->commands = av + 2;
-	return (true);
-}
 
 static void	destroy_pipex(t_pipex *p)
 {
@@ -82,56 +36,28 @@ static void	destroy_pipex(t_pipex *p)
 	}
 }
 
-/*
-static void	print_pipex(t_pipex *p)
+static t_bool	load_pipex(int ac, char **av, char **env, t_pipex *p)
 {
-	char	**cursor;
-
-	cursor = p->commands;
-	printf("Source: %s (%d)\n", p->source, p->source_fd);
-	printf("Dest: %s (%d)\n", p->dest, p->dest_fd);
-	puts("Commands: [");
-	while (*(cursor + 1))
+	p->source = av[1];
+	p->dest = av[ac - 1];
+	p->env = env;
+	p->dest_oflags = O_WRONLY | O_CREAT | O_TRUNC;
+	p->dest_mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+	p->source_fd = open_file(p->source, O_RDONLY, 0);
+	if (p->source_fd <= 0)
+		return (false);
+	p->dest_fd = open_file(p->dest, p->dest_oflags, p->dest_mode);
+	if (p->dest_fd <= 0)
 	{
-		printf("\t\"%s\"\n", *cursor);
-		cursor++;
+		if (close(p->source_fd) == -1)
+			perror(p->dest);
+		return (false);
 	}
-	puts("]");
-}
-*/
-
-static void	child_process(int input, t_pipex *p)
-{
-	t_cmd	cmd;
-	t_bool	ret;
-	int		error;
-
-	ret = load_cmd(p, &cmd, p->commands[1]);
-	if (ret == false)
-		return ;
-	substitute_fd(p->dest_fd, STDOUT_FILENO, p);
-	substitute_fd(input, STDIN_FILENO, NULL);
-	error = execve(cmd.pathname, cmd.argv, cmd.env);
-	if (error == -1)
-		perror(cmd.raw);
-	destroy_cmd(&cmd);
-}
-
-static void	first_process(int output, t_pipex *p)
-{
-	t_cmd	cmd;
-	t_bool	ret;
-	int		error;
-
-	ret = load_cmd(p, &cmd, p->commands[0]);
-	if (ret == false)
-		return ;
-	substitute_fd(p->source_fd, STDIN_FILENO, p);
-	substitute_fd(output, STDOUT_FILENO, NULL);
-	error = execve(cmd.pathname, cmd.argv, cmd.env);
-	if (error == -1)
-		perror(cmd.raw);
-	destroy_cmd(&cmd);
+	p->commands = av + 2;
+	p->path = build_path(p->env);
+	if (p->path == NULL)
+		return ((destroy_pipex(p), false));
+	return (true);
 }
 
 static void	pipex(t_pipex *p)
@@ -150,7 +76,7 @@ static void	pipex(t_pipex *p)
 	else if (cpid == PIPEX_CHILD)
 	{
 		close(pipefd[PIPEX_PARENT]);
-		child_process(pipefd[PIPEX_CHILD], p);
+		last_process(pipefd[PIPEX_CHILD], p);
 	}
 	else
 	{
@@ -164,7 +90,6 @@ int	main(int ac, char **av)
 	t_pipex		p;
 	extern char	**environ;
 
-	(void)pipex;
 	if (ac < 5 || !load_pipex(ac, av, environ, &p))
 		return (EXIT_FAILURE);
 	pipex(&p);

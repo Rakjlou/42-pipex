@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/16 17:38:46 by nsierra-          #+#    #+#             */
-/*   Updated: 2021/12/18 04:42:43 by nsierra-         ###   ########.fr       */
+/*   Updated: 2021/12/18 05:16:26 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,11 +61,17 @@ char	*ft_strdup(const char *s1);
 char	**ft_split(char const *str, const char *sep);
 void	ft_free_strarray(char ***array);
 
-// utils.c
-void	substitute_fd(int fd1, int fd2, t_pipex *p);
+//process.c
+void	last_process(int input, t_pipex *p);
+void	first_process(int output, t_pipex *p);
 
 // cmd.c
 t_bool	load_cmd(t_pipex *p, t_cmd *cmd, char *raw);
 void	destroy_cmd(t_cmd *cmd);
+
+// utils.c
+void	substitute_fd(int fd1, int fd2, t_pipex *p);
+int		open_file(const char *filename, int oflags, int mode);
+char	**build_path(char **env);
 
 #endif
