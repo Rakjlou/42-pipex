@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/16 17:38:46 by nsierra-          #+#    #+#             */
-/*   Updated: 2021/12/18 00:48:33 by nsierra-         ###   ########.fr       */
+/*   Updated: 2021/12/18 04:42:43 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ typedef struct s_pipex
 	char		**path;
 	int			source_fd;
 	int			dest_fd;
+	int			dest_oflags;
 	int			dest_mode;
 }	t_pipex;
 

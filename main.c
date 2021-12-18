@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/16 16:10:36 by nsierra-          #+#    #+#             */
-/*   Updated: 2021/12/18 00:51:57 by nsierra-         ###   ########.fr       */
+/*   Updated: 2021/12/18 04:48:27 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,11 @@
 #include <sys/wait.h>
 #include "pipex.h"
 
-static int	open_file(const char *filename, int mode)
+static int	open_file(const char *filename, int oflags, int mode)
 {
 	int	fd;
 
-	fd = open(filename, mode);
+	fd = open(filename, oflags, mode);
 	if (fd <= 0)
 		return (perror(filename), -1);
 	return (fd);
@@ -46,11 +46,12 @@ static t_bool	load_pipex(int ac, char **av, char **env, t_pipex *p)
 	p->dest = av[ac - 1];
 	p->env = env;
 	p->path = build_path(p->env);
-	p->dest_mode = O_WRONLY | O_CREAT | O_TRUNC;
-	p->source_fd = open_file(p->source, O_RDONLY);
+	p->dest_oflags = O_WRONLY | O_CREAT | O_TRUNC;
+	p->dest_mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+	p->source_fd = open_file(p->source, O_RDONLY, 0);
 	if (p->source_fd <= 0)
 		return (false);
-	p->dest_fd = open_file(p->dest, p->dest_mode);
+	p->dest_fd = open_file(p->dest, p->dest_oflags, p->dest_mode);
 	if (p->dest_fd <= 0)
 	{
 		if (close(p->source_fd) == -1)
@@ -99,21 +100,37 @@ static void	print_pipex(t_pipex *p)
 }
 */
 
-static void	child_process(int input)
+static void	child_process(int input, t_pipex *p)
 {
-	(void)input;
+	t_cmd	cmd;
+	t_bool	ret;
+	int		error;
+
+	ret = load_cmd(p, &cmd, p->commands[1]);
+	if (ret == false)
+		return ;
+	substitute_fd(p->dest_fd, STDOUT_FILENO, p);
+	substitute_fd(input, STDIN_FILENO, NULL);
+	error = execve(cmd.pathname, cmd.argv, cmd.env);
+	if (error == -1)
+		perror(cmd.raw);
+	destroy_cmd(&cmd);
 }
 
 static void	first_process(int output, t_pipex *p)
 {
 	t_cmd	cmd;
 	t_bool	ret;
+	int		error;
 
 	ret = load_cmd(p, &cmd, p->commands[0]);
-	printf(">>>(%d) %s\n", ret, cmd.pathname);
+	if (ret == false)
+		return ;
 	substitute_fd(p->source_fd, STDIN_FILENO, p);
 	substitute_fd(output, STDOUT_FILENO, NULL);
-	//execve(p->commands[0], NULL, NULL);
+	error = execve(cmd.pathname, cmd.argv, cmd.env);
+	if (error == -1)
+		perror(cmd.raw);
 	destroy_cmd(&cmd);
 }
 
@@ -133,7 +150,7 @@ static void	pipex(t_pipex *p)
 	else if (cpid == PIPEX_CHILD)
 	{
 		close(pipefd[PIPEX_PARENT]);
-		child_process(pipefd[PIPEX_CHILD]);
+		child_process(pipefd[PIPEX_CHILD], p);
 	}
 	else
 	{
@@ -152,5 +169,5 @@ int	main(int ac, char **av)
 		return (EXIT_FAILURE);
 	pipex(&p);
 	destroy_pipex(&p);
-	return (EXIT_SUCCESS);
+	return (EXIT_FAILURE);
 }
