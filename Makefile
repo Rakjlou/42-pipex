@@ -6,7 +6,7 @@
 #    By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/12/10 23:54:46 by nsierra-          #+#    #+#              #
-#    Updated: 2021/12/17 01:34:18 by nsierra-         ###   ########.fr        #
+#    Updated: 2021/12/18 00:50:56 by nsierra-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,12 +26,14 @@ SRC = main.c \
 	libft/ft_substr.c \
 	libft/ft_memcpy.c \
 	libft/ft_strlcat.c \
+	libft/ft_strdup.c \
+	libft/ft_free_strarray.c \
 
 OBJ = $(SRC:.c=.o)
 
 CC = gcc
 
-CFLAGS = -Wall -Wextra -Werror -pedantic -I.
+CFLAGS = -Wall -Wextra -Werror -pedantic -I. -g3
 
 all: $(NAME)
 

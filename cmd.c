@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/17 00:05:34 by nsierra-          #+#    #+#             */
-/*   Updated: 2021/12/17 01:37:35 by nsierra-         ###   ########.fr       */
+/*   Updated: 2021/12/18 04:19:37 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,50 +15,79 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static char	*build_pathname(const char *path, const char *name)
+static char	*build_pathname(const char *path, const char *cmd)
 {
 	char	*pathname;
 	size_t	total;
 	size_t	total_path;
-	size_t	total_name;
+	size_t	total_cmd;
 
 	total_path = ft_strlen(path);
-	total_name = ft_strlen(name);
-	total = 1 + total_path + total_name;
+	total_cmd = ft_strlen(cmd);
+	total = 1 + total_path + total_cmd;
 	if (total_path > 0 && path[total_path - 1] != '/')
 		total += 1;
-	pathname = ft_calloc(sizeof(char), total + 1);
+	pathname = ft_calloc(sizeof(char), total);
 	if (pathname == NULL)
 		return (NULL);
 	ft_strlcat(pathname, path, total);
 	if (total_path > 0 && path[total_path - 1] != '/')
 		ft_strlcat(pathname, "/", total);
-	ft_strlcat(pathname, name, total);
+	ft_strlcat(pathname, cmd, total);
 	return (pathname);
+}
+
+static char	*get_direct_pathname(char *cmd)
+{
+	if (access(cmd, X_OK) != 0)
+		return (NULL);
+	return (ft_strdup(cmd));
+}
+
+static char	*get_pathname(char **path, char *cmd)
+{
+	int		i;
+	char	*candidate;
+
+	i = 0;
+	if (cmd[0] == '/' || (cmd[0] == '.' && cmd[1] == '/'))
+		return (get_direct_pathname(cmd));
+	else
+	{
+		while (path[i])
+		{
+			candidate = build_pathname(path[i], cmd);
+			if (access(candidate, X_OK) == 0)
+				return (candidate);
+			free(candidate);
+			++i;
+		}
+	}
+	return (NULL);
+}
+
+void	destroy_cmd(t_cmd *cmd)
+{
+	if (cmd->argv != NULL)
+		ft_free_strarray(&cmd->argv);
+	if (cmd->pathname != NULL)
+		free(cmd->pathname);
 }
 
 t_bool	load_cmd(t_pipex *p, t_cmd *cmd, char *raw)
 {
-	int		i;
-	char	*pathname;
-
 	cmd->raw = raw;
 	cmd->env = p->env;
-	cmd->argv = ft_split(raw, ' '); // Huge flaw, should split on all spaces
+	cmd->argv = ft_split(raw, " \t\n\v\f\r");
 	if (cmd->argv == NULL)
 		return (false);
-	i = 0;
-	while (p->path[i])
+	cmd->pathname = get_pathname(p->path, cmd->argv[0]);
+	if (cmd->pathname == NULL)
 	{
-		pathname = build_pathname(p->path[i], cmd->argv[0]);
-		if (access(pathname, X_OK) == 0)
-		{
-			cmd->pathname = pathname;
-			return (true);
-		}
-		free(pathname);
-		i++;
+		ft_putstr_fd("command not found: ", STDERR_FILENO);
+		ft_putendl_fd(cmd->argv[0], STDERR_FILENO);
+		ft_free_strarray(&cmd->argv);
+		return (false);
 	}
-	// Command not found
-	return (false);
+	return (true);
 }

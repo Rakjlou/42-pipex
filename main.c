@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/16 16:10:36 by nsierra-          #+#    #+#             */
-/*   Updated: 2021/12/17 01:39:39 by nsierra-         ###   ########.fr       */
+/*   Updated: 2021/12/18 00:51:57 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ static char	**build_path(char **env)
 	while (*env)
 	{
 		if (ft_strncmp("PATH=", *env, 5) == 0 && ft_strlen(*env) > 5)
-			return (ft_split(*env + 5, ':'));
+			return (ft_split(*env + 5, ":"));
 		env++;
 	}
 	return (NULL);
@@ -114,6 +114,7 @@ static void	first_process(int output, t_pipex *p)
 	substitute_fd(p->source_fd, STDIN_FILENO, p);
 	substitute_fd(output, STDOUT_FILENO, NULL);
 	//execve(p->commands[0], NULL, NULL);
+	destroy_cmd(&cmd);
 }
 
 static void	pipex(t_pipex *p)
