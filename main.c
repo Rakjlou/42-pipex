@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/16 16:10:36 by nsierra-          #+#    #+#             */
-/*   Updated: 2021/12/19 05:31:32 by nsierra-         ###   ########.fr       */
+/*   Updated: 2021/12/19 11:08:25 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,12 @@ void	pipex(t_pipex *p,
 		return ;
 	}
 	cpid = fork();
+	/*
+	 * Logic here is flawed, parent processes should have control over
+	 * their child's behavior (exit status)
+	 *
+	 * I need to fix it or I'll never be a good dad.
+	 */
 	if (cpid == -1)
 		perror("pipex fork");
 	else if (cpid == PIPEX_CHILD)
