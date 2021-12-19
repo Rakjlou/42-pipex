@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/18 05:13:49 by nsierra-          #+#    #+#             */
-/*   Updated: 2021/12/19 05:39:16 by nsierra-         ###   ########.fr       */
+/*   Updated: 2021/12/19 08:22:07 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ static void	first_process(t_pipex *p, int output)
 	destroy_cmd(&cmd);
 }
 
-static void	exec_inbetween(t_pipex *p, int output)
+static void	middle_process_exec(t_pipex *p, int output)
 {
 	t_cmd	cmd;
 	t_bool	ret;
@@ -67,10 +67,10 @@ static void	exec_inbetween(t_pipex *p, int output)
 	destroy_cmd(&cmd);
 }
 
-static void	inbetween_process(t_pipex *p, int input)
+static void	middle_process(t_pipex *p, int input)
 {
 	substitute_fd(input, STDIN_FILENO, NULL);
-	pipex(p, exec_inbetween, dispatch_process);
+	pipex(p, middle_process_exec, dispatch_process);
 }
 
 void	dispatch_process(t_pipex *p, int fd)
@@ -81,7 +81,7 @@ void	dispatch_process(t_pipex *p, int fd)
 	if (c == 0)
 		first_process(p, fd);
 	else if (c > 0 && c + 1 < p->cmd_count)
-		inbetween_process(p, fd);
+		middle_process(p, fd);
 	else
 		last_process(p, fd);
 }
