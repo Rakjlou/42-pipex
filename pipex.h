@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/16 17:38:46 by nsierra-          #+#    #+#             */
-/*   Updated: 2021/12/19 04:18:04 by nsierra-         ###   ########.fr       */
+/*   Updated: 2021/12/19 05:31:53 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,8 @@ typedef struct s_pipex
 	char		**commands;
 	char		**env;
 	char		**path;
+	int			current_cmd;
+	int			cmd_count;
 	int			source_fd;
 	int			dest_fd;
 	int			dest_oflags;
@@ -62,16 +64,21 @@ char	**ft_split(char const *str, const char *sep);
 void	ft_free_strarray(char ***array);
 
 //process.c
-void	last_process(int input, t_pipex *p);
-void	first_process(int output, t_pipex *p);
+//void	last_process(t_pipex *p, int input);
+//void	first_process(t_pipex *p, int output);
+void	dispatch_process(t_pipex *p, int fd);
 
 // cmd.c
-t_bool	load_cmd(t_pipex *p, t_cmd *cmd, char *raw);
+t_bool	load_cmd(t_pipex *p, t_cmd *cmd);
 void	destroy_cmd(t_cmd *cmd);
 
 // utils.c
 void	substitute_fd(int fd1, int fd2, t_pipex *p);
 int		open_file(const char *filename, int oflags, int mode);
 char	**build_path(char **env);
+
+void	pipex(t_pipex *p,
+			void (*parent)(t_pipex *, int),
+			void (*child)(t_pipex *, int));
 
 #endif

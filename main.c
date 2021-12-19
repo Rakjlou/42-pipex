@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/16 16:10:36 by nsierra-          #+#    #+#             */
-/*   Updated: 2021/12/19 04:15:56 by nsierra-         ###   ########.fr       */
+/*   Updated: 2021/12/19 05:31:32 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,8 @@ static void	destroy_pipex(t_pipex *p)
 
 static t_bool	load_pipex(int ac, char **av, char **env, t_pipex *p)
 {
+	p->current_cmd = 0;
+	p->cmd_count = ac - 3;
 	p->source = av[1];
 	p->dest = av[ac - 1];
 	p->env = env;
@@ -58,7 +60,9 @@ static t_bool	load_pipex(int ac, char **av, char **env, t_pipex *p)
 	return (true);
 }
 
-static void	pipex(t_pipex *p)
+void	pipex(t_pipex *p,
+	void (*parent)(t_pipex *, int),
+	void (*child)(t_pipex *, int))
 {
 	int		pipefd[2];
 	pid_t	cpid;
@@ -73,13 +77,14 @@ static void	pipex(t_pipex *p)
 		perror("pipex fork");
 	else if (cpid == PIPEX_CHILD)
 	{
+		p->current_cmd++;
 		close(pipefd[PIPEX_PARENT]);
-		last_process(pipefd[PIPEX_CHILD], p);
+		child(p, pipefd[PIPEX_CHILD]);
 	}
 	else
 	{
 		close(pipefd[PIPEX_CHILD]);
-		first_process(pipefd[PIPEX_PARENT], p);
+		parent(p, pipefd[PIPEX_PARENT]);
 	}
 }
 
@@ -90,7 +95,7 @@ int	main(int ac, char **av)
 
 	if (ac < 5 || !load_pipex(ac, av, environ, &p))
 		return (EXIT_FAILURE);
-	pipex(&p);
+	pipex(&p, dispatch_process, dispatch_process);
 	destroy_pipex(&p);
 	return (EXIT_FAILURE);
 }

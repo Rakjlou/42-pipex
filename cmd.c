@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/17 00:05:34 by nsierra-          #+#    #+#             */
-/*   Updated: 2021/12/19 04:08:44 by nsierra-         ###   ########.fr       */
+/*   Updated: 2021/12/19 05:24:38 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,11 +74,11 @@ void	destroy_cmd(t_cmd *cmd)
 		free(cmd->pathname);
 }
 
-t_bool	load_cmd(t_pipex *p, t_cmd *cmd, char *raw)
+t_bool	load_cmd(t_pipex *p, t_cmd *cmd)
 {
-	cmd->raw = raw;
+	cmd->raw = p->commands[p->current_cmd];
 	cmd->env = p->env;
-	cmd->argv = ft_split(raw, " \t\n\v\f\r");
+	cmd->argv = ft_split(cmd->raw, " \t\n\v\f\r");
 	if (cmd->argv == NULL)
 		return (false);
 	cmd->pathname = get_pathname(p->path, cmd->argv[0]);
