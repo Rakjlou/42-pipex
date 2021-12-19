@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/18 05:13:49 by nsierra-          #+#    #+#             */
-/*   Updated: 2021/12/19 05:28:29 by nsierra-         ###   ########.fr       */
+/*   Updated: 2021/12/19 05:39:16 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,8 +73,6 @@ static void	inbetween_process(t_pipex *p, int input)
 	pipex(p, exec_inbetween, dispatch_process);
 }
 
-// total 4    0        1        2        3
-// < main.c cat | grep a | grep b | grep c
 void	dispatch_process(t_pipex *p, int fd)
 {
 	int	c;
