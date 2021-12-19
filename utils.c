@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/16 19:03:13 by nsierra-          #+#    #+#             */
-/*   Updated: 2021/12/18 05:27:35 by nsierra-         ###   ########.fr       */
+/*   Updated: 2021/12/19 04:17:50 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	substitute_fd(int fd1, int fd2, t_pipex *p)
 	close(fd1);
 	if (p != NULL && fd1 == p->source_fd)
 		p->source_fd = -1;
-	else if (p != NULL && fd2 == p->dest_fd)
+	else if (p != NULL && fd1 == p->dest_fd)
 		p->dest_fd = -1;
 }
 

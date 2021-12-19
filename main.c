@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/16 16:10:36 by nsierra-          #+#    #+#             */
-/*   Updated: 2021/12/18 05:29:52 by nsierra-         ###   ########.fr       */
+/*   Updated: 2021/12/19 04:15:56 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,13 +50,11 @@ static t_bool	load_pipex(int ac, char **av, char **env, t_pipex *p)
 	if (p->dest_fd <= 0)
 	{
 		if (close(p->source_fd) == -1)
-			perror(p->dest);
+			perror(p->source);
 		return (false);
 	}
 	p->commands = av + 2;
 	p->path = build_path(p->env);
-	if (p->path == NULL)
-		return ((destroy_pipex(p), false));
 	return (true);
 }
 

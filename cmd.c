@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/17 00:05:34 by nsierra-          #+#    #+#             */
-/*   Updated: 2021/12/18 04:19:37 by nsierra-         ###   ########.fr       */
+/*   Updated: 2021/12/19 04:08:44 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ static char	*get_pathname(char **path, char *cmd)
 	i = 0;
 	if (cmd[0] == '/' || (cmd[0] == '.' && cmd[1] == '/'))
 		return (get_direct_pathname(cmd));
-	else
+	else if (path != NULL)
 	{
 		while (path[i])
 		{
