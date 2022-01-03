@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/16 17:38:46 by nsierra-          #+#    #+#             */
-/*   Updated: 2021/12/19 05:31:53 by nsierra-         ###   ########.fr       */
+/*   Updated: 2022/01/04 00:53:55 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,14 +15,29 @@
 
 # include <stddef.h>
 
-# define PIPEX_PARENT 1
-# define PIPEX_CHILD 0
-
 typedef enum e_bool
 {
 	false,
 	true
 }	t_bool;
+
+typedef enum e_family
+{
+	child
+}	t_family;
+
+typedef enum e_pipe
+{
+	out,
+	in
+}	t_pipe;
+
+typedef enum e_position
+{
+	first,
+	middle,
+	last
+}	t_position;
 
 typedef struct s_pipex
 {
@@ -31,6 +46,8 @@ typedef struct s_pipex
 	char		**commands;
 	char		**env;
 	char		**path;
+	int			pipe[2];
+	int			exit_status;
 	int			current_cmd;
 	int			cmd_count;
 	int			source_fd;
@@ -64,9 +81,10 @@ char	**ft_split(char const *str, const char *sep);
 void	ft_free_strarray(char ***array);
 
 //process.c
-//void	last_process(t_pipex *p, int input);
-//void	first_process(t_pipex *p, int output);
-void	dispatch_process(t_pipex *p, int fd);
+void	execute_command(t_pipex *p, t_position position);
+void	handle_prev_pipe(int in, int out);
+void	handle_next_pipe(int in, int out);
+void	close_pipe(int in, int out);
 
 // cmd.c
 t_bool	load_cmd(t_pipex *p, t_cmd *cmd);
@@ -76,6 +94,7 @@ void	destroy_cmd(t_cmd *cmd);
 void	substitute_fd(int fd1, int fd2, t_pipex *p);
 int		open_file(const char *filename, int oflags, int mode);
 char	**build_path(char **env);
+void	destroy_pipex(t_pipex *p);
 
 void	pipex(t_pipex *p,
 			void (*parent)(t_pipex *, int),

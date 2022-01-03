@@ -6,13 +6,14 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/16 19:03:13 by nsierra-          #+#    #+#             */
-/*   Updated: 2021/12/19 04:17:50 by nsierra-         ###   ########.fr       */
+/*   Updated: 2022/01/04 00:54:07 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "pipex.h"
 
 void	substitute_fd(int fd1, int fd2, t_pipex *p)
@@ -44,4 +45,24 @@ char	**build_path(char **env)
 		env++;
 	}
 	return (NULL);
+}
+
+void	destroy_pipex(t_pipex *p)
+{
+	int	i;
+
+	if (p->source_fd > 0 && close(p->source_fd) == -1)
+		perror(p->source);
+	else if (p->dest_fd > 0 && close(p->dest_fd) == -1)
+		perror(p->dest);
+	else if (p->path != NULL)
+	{
+		i = 0;
+		while (p->path[i])
+		{
+			free(p->path[i]);
+			i++;
+		}
+		free(p->path);
+	}
 }

@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/16 16:10:36 by nsierra-          #+#    #+#             */
-/*   Updated: 2021/12/19 11:08:25 by nsierra-         ###   ########.fr       */
+/*   Updated: 2022/01/04 00:56:09 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,9 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include "pipex.h"
-
-static void	destroy_pipex(t_pipex *p)
-{
-	int	i;
-
-	if (p->source_fd > 0 && close(p->source_fd) == -1)
-		perror(p->source);
-	else if (p->dest_fd > 0 && close(p->dest_fd) == -1)
-		perror(p->dest);
-	else if (p->path != NULL)
-	{
-		i = 0;
-		while (p->path[i])
-		{
-			free(p->path[i]);
-			i++;
-		}
-		free(p->path);
-	}
-}
 
 static t_bool	load_pipex(int ac, char **av, char **env, t_pipex *p)
 {
@@ -60,38 +42,88 @@ static t_bool	load_pipex(int ac, char **av, char **env, t_pipex *p)
 	return (true);
 }
 
-void	pipex(t_pipex *p,
-	void (*parent)(t_pipex *, int),
-	void (*child)(t_pipex *, int))
+void	pipex_first(t_pipex *p)
 {
-	int		pipefd[2];
 	pid_t	cpid;
 
-	if (pipe(pipefd) == -1)
+	if (pipe(p->pipe) == -1)
 	{
-		perror("pipex pipe");
+		perror("pipex first pipe");
 		return ;
 	}
 	cpid = fork();
-	/*
-	 * Logic here is flawed, parent processes should have control over
-	 * their child's behavior (exit status)
-	 *
-	 * I need to fix it or I'll never be a good dad.
-	 */
 	if (cpid == -1)
-		perror("pipex fork");
-	else if (cpid == PIPEX_CHILD)
+		perror("pipex first fork");
+	else if (cpid == child)
 	{
-		p->current_cmd++;
-		close(pipefd[PIPEX_PARENT]);
-		child(p, pipefd[PIPEX_CHILD]);
+		handle_next_pipe(p->pipe[in], p->pipe[out]);
+		execute_command(p, first);
+	}
+}
+
+void	pipex_last(t_pipex *p)
+{
+	pid_t	cpid;
+
+	cpid = fork();
+	if (cpid == -1)
+		perror("pipex last fork");
+	else if (cpid == child)
+	{
+		handle_prev_pipe(p->pipe[in], p->pipe[out]);
+		execute_command(p, last);
 	}
 	else
+		close_pipe(p->pipe[in], p->pipe[out]);
+}
+
+void	pipex_middle(t_pipex *p)
+{
+	int		old_out;
+	int		old_in;
+	pid_t	cpid;
+
+	old_out = p->pipe[out];
+	old_in = p->pipe[in];
+	if (pipe(p->pipe) == -1)
 	{
-		close(pipefd[PIPEX_CHILD]);
-		parent(p, pipefd[PIPEX_PARENT]);
+		perror("pipex middle pipe");
+		return ;
 	}
+	cpid = fork();
+	if (cpid == -1)
+		perror("pipex middle fork");
+	else if (cpid == child)
+	{
+		handle_prev_pipe(old_in, old_out);
+		handle_next_pipe(p->pipe[in], p->pipe[out]);
+		execute_command(p, middle);
+	}
+	else
+		close_pipe(p->pipe[in], p->pipe[out]);
+}
+
+void	pipex_supervise(t_pipex *p)
+{
+	int		status;
+	int		exit_status;
+
+	exit_status = EXIT_SUCCESS;
+	pipex_first(p);
+	p->current_cmd++;
+	while (p->current_cmd + 1 < p->cmd_count)
+	{
+		pipex_middle(p);
+		p->current_cmd++;
+	}
+	pipex_last(p);
+	while (waitpid(-1, &status, 0) > 0)
+	{
+		if (WIFEXITED(status) && WEXITSTATUS(status) != EXIT_SUCCESS)
+			exit_status = WEXITSTATUS(status);
+	}
+	destroy_pipex(p);
+	exit(exit_status);
 }
 
 int	main(int ac, char **av)
@@ -101,7 +133,7 @@ int	main(int ac, char **av)
 
 	if (ac < 5 || !load_pipex(ac, av, environ, &p))
 		return (EXIT_FAILURE);
-	pipex(&p, dispatch_process, dispatch_process);
+	pipex_supervise(&p);
 	destroy_pipex(&p);
 	return (EXIT_FAILURE);
 }
