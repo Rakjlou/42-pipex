@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/16 17:38:46 by nsierra-          #+#    #+#             */
-/*   Updated: 2022/01/04 00:53:55 by nsierra-         ###   ########.fr       */
+/*   Updated: 2022/01/04 01:03:59 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,12 +80,6 @@ char	*ft_strdup(const char *s1);
 char	**ft_split(char const *str, const char *sep);
 void	ft_free_strarray(char ***array);
 
-//process.c
-void	execute_command(t_pipex *p, t_position position);
-void	handle_prev_pipe(int in, int out);
-void	handle_next_pipe(int in, int out);
-void	close_pipe(int in, int out);
-
 // cmd.c
 t_bool	load_cmd(t_pipex *p, t_cmd *cmd);
 void	destroy_cmd(t_cmd *cmd);
@@ -94,10 +88,17 @@ void	destroy_cmd(t_cmd *cmd);
 void	substitute_fd(int fd1, int fd2, t_pipex *p);
 int		open_file(const char *filename, int oflags, int mode);
 char	**build_path(char **env);
+
+// utils_pipe.c
+void	handle_prev_pipe(int in, int out);
+void	handle_next_pipe(int in, int out);
+void	close_pipe(int in, int out);
+
+// utils_pipex.c
+t_bool	load_pipex(int ac, char **av, char **env, t_pipex *p);
 void	destroy_pipex(t_pipex *p);
 
-void	pipex(t_pipex *p,
-			void (*parent)(t_pipex *, int),
-			void (*child)(t_pipex *, int));
+// exec_all.c
+void	exec_all(t_pipex *p);
 
 #endif

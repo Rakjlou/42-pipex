@@ -6,16 +6,18 @@
 #    By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/12/10 23:54:46 by nsierra-          #+#    #+#              #
-#    Updated: 2021/12/18 05:16:35 by nsierra-         ###   ########.fr        #
+#    Updated: 2022/01/04 01:05:22 by nsierra-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = pipex
 
-SRC = main.c \
+SRC = cmd.c \
+	exec_all.c \
+	main.c \
 	utils.c \
-	cmd.c \
-	process.c \
+	utils_pipe.c \
+	utils_pipex.c \
 	libft/ft_bzero.c \
 	libft/ft_calloc.c \
 	libft/ft_memset.c \

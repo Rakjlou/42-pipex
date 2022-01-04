@@ -6,14 +6,13 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/17 00:05:34 by nsierra-          #+#    #+#             */
-/*   Updated: 2022/01/03 23:56:35 by nsierra-         ###   ########.fr       */
+/*   Updated: 2022/01/04 01:06:05 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 static char	*build_pathname(const char *path, const char *cmd)
 {
