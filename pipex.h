@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/16 17:38:46 by nsierra-          #+#    #+#             */
-/*   Updated: 2022/01/04 01:03:59 by nsierra-         ###   ########.fr       */
+/*   Updated: 2022/01/04 01:14:05 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@ typedef struct s_pipex
 	char		**env;
 	char		**path;
 	int			pipe[2];
-	int			exit_status;
 	int			current_cmd;
 	int			cmd_count;
 	int			source_fd;
