@@ -12,10 +12,8 @@
 
 #include "pipex.h"
 #include <unistd.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/wait.h>
+#include <stdio.h>
 
 static void	execute_command(t_pipex *p, t_position position)
 {

@@ -102,11 +102,6 @@ int		open_file(const char *filename, int oflags, int mode);
 char	**build_path(char **env);
 void	heredoc(t_pipex *p);
 
-// utils_pipe.c
-void	handle_prev_pipe(int in, int out);
-void	handle_next_pipe(int in, int out);
-void	close_pipe(int in, int out);
-
 // utils_pipex.c
 t_bool	load_pipex(int ac, char **av, char **env, t_pipex *p);
 void	destroy_pipex(t_pipex *p);
