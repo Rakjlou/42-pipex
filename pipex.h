@@ -13,6 +13,7 @@
 #ifndef PIPEX_H
 # define PIPEX_H
 
+# define BUFFER_SIZE 4096
 # include <stddef.h>
 
 typedef enum e_bool
@@ -39,10 +40,20 @@ typedef enum e_position
 	last
 }	t_position;
 
+typedef struct s_gnl_node
+{
+	char			*buffer;
+	size_t			start;
+	size_t			end;
+	size_t			len;
+	struct s_gnl_node	*next;
+}	t_gnl_node;
+
 typedef struct s_pipex
 {
 	const char	*source;
 	const char	*dest;
+	char		*heredoc_del;
 	char		**commands;
 	char		**env;
 	char		**path;
@@ -77,6 +88,8 @@ void	*ft_calloc(size_t count, size_t size);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
 char	*ft_strdup(const char *s1);
 char	**ft_split(char const *str, const char *sep);
+char	*ft_strjoin(char const *s1, char const *s2);
+char	*get_next_line(int fd);
 void	ft_free_strarray(char ***array);
 
 // cmd.c
