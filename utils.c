@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 void	substitute_fd(int fd1, int fd2, t_pipex *p)
 {
@@ -44,4 +45,25 @@ char	**build_path(char **env)
 		env++;
 	}
 	return (NULL);
+}
+
+void	heredoc(t_pipex *p)
+{
+	char	*line;
+	size_t	len;
+
+	while (42)
+	{
+		line = get_next_line(STDIN_FILENO);
+		if (line == NULL)
+			break ;
+		len = ft_strlen(line);
+		if (len > 1 && ft_strncmp(p->heredoc_del, line, len - 1) == 0)
+		{
+			free(line);
+			break ;
+		}
+		write(STDOUT_FILENO, line, len);
+		free(line);
+	}
 }

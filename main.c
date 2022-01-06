@@ -18,7 +18,7 @@ int	main(int ac, char **av)
 	t_pipex		p;
 	extern char	**environ;
 
-	if (ac < 5 || !load_pipex(ac, av, environ, &p))
+	if (!load_pipex(ac, av, environ, &p))
 		return (EXIT_FAILURE);
 	exec_all(&p);
 	destroy_pipex(&p);

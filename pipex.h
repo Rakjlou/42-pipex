@@ -100,6 +100,7 @@ void	destroy_cmd(t_cmd *cmd);
 void	substitute_fd(int fd1, int fd2, t_pipex *p);
 int		open_file(const char *filename, int oflags, int mode);
 char	**build_path(char **env);
+void	heredoc(t_pipex *p);
 
 // utils_pipe.c
 void	handle_prev_pipe(int in, int out);

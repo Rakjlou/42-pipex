@@ -16,7 +16,6 @@ SRC = cmd.c \
 	exec_all.c \
 	main.c \
 	utils.c \
-	utils_dup.c \
 	utils_pipex.c \
 	libft/ft_bzero.c \
 	libft/ft_calloc.c \
@@ -31,6 +30,7 @@ SRC = cmd.c \
 	libft/ft_strlcat.c \
 	libft/ft_strdup.c \
 	libft/ft_free_strarray.c \
+	libft/get_next_line.c
 
 OBJ = $(SRC:.c=.o)
 

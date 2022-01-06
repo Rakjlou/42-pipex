@@ -53,8 +53,22 @@ static void	pipex_first(t_pipex *p)
 		perror("pipex first fork");
 	else if (cpid == child)
 	{
-		handle_next_pipe(p->pipe[in], p->pipe[out]);
-		execute_command(p, first);
+		dup2(p->pipe[in], STDOUT_FILENO);
+		close(p->pipe[out]);
+		if (p->heredoc_del == NULL)
+			execute_command(p, first);
+		else
+		{
+			heredoc(p);
+			destroy_pipex(p);
+			exit(EXIT_SUCCESS);
+		}
+	}
+	else
+	{
+		if (p->heredoc_del != NULL)
+			wait(NULL);
+		close(p->pipe[in]);
 	}
 }
 
@@ -67,21 +81,20 @@ static void	pipex_last(t_pipex *p)
 		perror("pipex last fork");
 	else if (cpid == child)
 	{
-		handle_prev_pipe(p->pipe[in], p->pipe[out]);
+		dup2(p->pipe[out], STDIN_FILENO);
+		close(p->pipe[out]);
 		execute_command(p, last);
 	}
 	else
-		close_pipe(p->pipe[in], p->pipe[out]);
+		close(p->pipe[out]);
 }
 
 static void	pipex_middle(t_pipex *p)
 {
-	int		old_out;
-	int		old_in;
+	int		prev_out;
 	pid_t	cpid;
 
-	old_out = p->pipe[out];
-	old_in = p->pipe[in];
+	prev_out = p->pipe[out];
 	if (pipe(p->pipe) == -1)
 	{
 		perror("pipex middle pipe");
@@ -92,12 +105,17 @@ static void	pipex_middle(t_pipex *p)
 		perror("pipex middle fork");
 	else if (cpid == child)
 	{
-		handle_prev_pipe(old_in, old_out);
-		handle_next_pipe(p->pipe[in], p->pipe[out]);
+		dup2(prev_out, STDIN_FILENO);
+		dup2(p->pipe[in], STDOUT_FILENO);
+		close(prev_out);
+		close(p->pipe[out]);
 		execute_command(p, middle);
 	}
 	else
-		close_pipe(p->pipe[in], p->pipe[out]);
+	{
+		close(prev_out);
+		close(p->pipe[in]);
+	}
 }
 
 void	exec_all(t_pipex *p)
@@ -107,7 +125,8 @@ void	exec_all(t_pipex *p)
 
 	exit_status = EXIT_SUCCESS;
 	pipex_first(p);
-	p->current_cmd++;
+	if (p->heredoc_del == NULL)
+		p->current_cmd++;
 	while (p->current_cmd + 1 < p->cmd_count)
 	{
 		pipex_middle(p);
