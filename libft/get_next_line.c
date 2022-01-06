@@ -16,8 +16,8 @@
 
 static t_gnl_node	*get_buffer(int fd)
 {
-	t_gnl_node  *new;
-	ssize_t read_len;
+	t_gnl_node	*new;
+	ssize_t		read_len;
 
 	new = malloc(sizeof(t_gnl_node));
 	if (new == NULL)
@@ -54,8 +54,8 @@ static void	free_list(t_gnl_node **list, t_gnl_node *stop)
 static char	*flush_list(t_gnl_node **list, size_t total)
 {
 	t_gnl_node	*node;
-	char	*newline;
-	size_t	i;
+	char		*newline;
+	size_t		i;
 
 	i = 0;
 	node = *list;
@@ -76,7 +76,7 @@ static char	*flush_list(t_gnl_node **list, size_t total)
 static char	*find_newline(t_gnl_node **list, int fd)
 {
 	t_gnl_node	*node;
-	size_t	total;
+	size_t		total;
 
 	node = *list;
 	total = 0;
@@ -105,5 +105,5 @@ char	*get_next_line(int fd)
 		if (list == NULL)
 			return (NULL);
 	}
-	return find_newline(&list, fd);
+	return (find_newline(&list, fd));
 }

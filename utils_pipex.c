@@ -54,10 +54,11 @@ t_bool	load_pipex(int ac, char **av, char **env, t_pipex *p)
 {
 	int	hd;
 
-	hd = ac > 1 && ft_strncmp("here_doc", av[1], ft_strlen(av[1])) == 0;
+	hd = (ac > 1 && ft_strncmp("here_doc", av[1], ft_strlen(av[1])) == 0);
 	if ((hd == 1 && ac < 6) || (hd == 0 && ac < 5))
 		return (print_usage(), false);
-	else if ((hd == 1 && !load_heredoc(ac, av, p)) || (hd == 0 && !load_regular(ac, av, p)))
+	else if ((hd == 1 && !load_heredoc(ac, av, p))
+		|| (hd == 0 && !load_regular(ac, av, p)))
 		return (false);
 	p->current_cmd = 0;
 	p->dest = av[ac - 1];

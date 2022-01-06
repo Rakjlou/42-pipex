@@ -58,11 +58,7 @@ static void	pipex_first(t_pipex *p)
 		if (p->heredoc_del == NULL)
 			execute_command(p, first);
 		else
-		{
-			heredoc(p);
-			destroy_pipex(p);
-			exit(EXIT_SUCCESS);
-		}
+			(heredoc(p), destroy_pipex(p), exit(EXIT_SUCCESS));
 	}
 	else
 	{

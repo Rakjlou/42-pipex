@@ -42,10 +42,10 @@ typedef enum e_position
 
 typedef struct s_gnl_node
 {
-	char			*buffer;
-	size_t			start;
-	size_t			end;
-	size_t			len;
+	char				*buffer;
+	size_t				start;
+	size_t				end;
+	size_t				len;
 	struct s_gnl_node	*next;
 }	t_gnl_node;
 
