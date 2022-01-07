@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/04 00:57:45 by nsierra-          #+#    #+#             */
-/*   Updated: 2022/01/04 01:10:24 by nsierra-         ###   ########.fr       */
+/*   Updated: 2022/01/07 21:45:49 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 static void	execute_command(t_pipex *p, t_position position)
 {
@@ -60,9 +62,9 @@ static void	pipex_first(t_pipex *p)
 	}
 	else
 	{
+		close(p->pipe[in]);
 		if (p->heredoc_del != NULL)
 			wait(NULL);
-		close(p->pipe[in]);
 	}
 }
 

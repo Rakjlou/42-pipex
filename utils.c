@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/16 19:03:13 by nsierra-          #+#    #+#             */
-/*   Updated: 2022/01/04 01:08:21 by nsierra-         ###   ########.fr       */
+/*   Updated: 2022/01/07 21:51:57 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,9 +59,7 @@ void	heredoc(t_pipex *p)
 		if (line == NULL)
 			break ;
 		len = ft_strlen(line);
-		if (len > 1)
-			line[len - 1] = '\0';
-		if (len > 1 && ft_strncmp(p->heredoc_del, line, UINT_MAX) == 0)
+		if (len > 1 && ft_strncmp(p->heredoc_del, line, len - 1) == 0)
 		{
 			free(line);
 			break ;
