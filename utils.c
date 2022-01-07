@@ -15,6 +15,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 
 void	substitute_fd(int fd1, int fd2, t_pipex *p)
 {
@@ -58,7 +59,9 @@ void	heredoc(t_pipex *p)
 		if (line == NULL)
 			break ;
 		len = ft_strlen(line);
-		if (len > 1 && ft_strncmp(p->heredoc_del, line, len - 1) == 0)
+		if (len > 1)
+			line[len - 1] = '\0';
+		if (len > 1 && ft_strncmp(p->heredoc_del, line, UINT_MAX) == 0)
 		{
 			free(line);
 			break ;
