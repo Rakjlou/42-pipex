@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/04 00:57:45 by nsierra-          #+#    #+#             */
-/*   Updated: 2022/01/07 22:07:54 by nsierra-         ###   ########.fr       */
+/*   Updated: 2022/01/07 22:37:11 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,14 @@ static void	execute_command(t_pipex *p, t_position position)
 	int		error;
 
 	ret = load_cmd(p, &cmd);
-	if (position == last && p->dest_fd)
+	if (position == last && p->dest_fd > 0)
 		substitute_fd(p->dest_fd, STDOUT_FILENO, p);
 	else if (position == first && p->source_fd > 0)
 		substitute_fd(p->source_fd, STDIN_FILENO, p);
+	else if (position == first)
+		close(STDIN_FILENO);
+	else if (position == last)
+		close(STDOUT_FILENO);
 	if (ret == true)
 	{
 		error = execve(cmd.pathname, cmd.argv, cmd.env);

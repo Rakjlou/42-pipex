@@ -6,7 +6,7 @@
 /*   By: nsierra- <nsierra-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/04 01:02:22 by nsierra-          #+#    #+#             */
-/*   Updated: 2022/01/07 22:11:26 by nsierra-         ###   ########.fr       */
+/*   Updated: 2022/01/07 22:38:48 by nsierra-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,12 @@ static t_bool	load_regular(int ac, char **av, t_pipex *p)
 	p->heredoc_del = NULL;
 	p->dest_oflags = O_WRONLY | O_CREAT | O_TRUNC;
 	p->source_fd = open_file(p->source, O_RDONLY, 0);
+	if (p->source_fd <= 0)
+	{
+		p->source_fd = open_file("/dev/null", O_RDONLY, 0);
+		if (p->source_fd <= 0)
+			return (perror("/dev/null"), false);
+	}
 	return (true);
 }
 
@@ -63,6 +69,12 @@ t_bool	load_pipex(int ac, char **av, char **env, t_pipex *p)
 	p->env = env;
 	p->dest_mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 	p->dest_fd = open_file(p->dest, p->dest_oflags, p->dest_mode);
+	if (p->dest_fd <= 0)
+	{
+		p->dest_fd = open_file("/dev/null", p->dest_oflags, p->dest_mode);
+		if (p->dest_fd <= 0)
+			return (perror("/dev/null"), false);
+	}
 	p->path = build_path(p->env);
 	return (true);
 }
